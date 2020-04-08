@@ -220,6 +220,20 @@ func (r *Remote) Submit(tx data.Transaction) (*SubmitResult, error) {
 	return cmd.Result, nil
 }
 
+// SubmitRaw Synchronously submit a raw transaction
+func (r *Remote) SubmitRaw(txRaw []byte) (*SubmitResult, error) {
+	cmd := &SubmitCommand{
+		Command: newCommand("submit"),
+		TxBlob:  fmt.Sprintf("%X", txRaw),
+	}
+	r.outgoing <- cmd
+	<-cmd.Ready
+	if cmd.CommandError != nil {
+		return nil, cmd.CommandError
+	}
+	return cmd.Result, nil
+}
+
 // Synchronously submit multiple transactions
 func (r *Remote) SubmitBatch(txs []data.Transaction) ([]*SubmitResult, error) {
 	commands := make([]*SubmitCommand, len(txs))
