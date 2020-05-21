@@ -346,6 +346,19 @@ func (r *Remote) LedgerHeader(ledger interface{}) (*LedgerHeaderResult, error) {
 	return cmd.Result, nil
 }
 
+// LedgerClose 获取最新的Ledger
+func (r *Remote) LedgerClose(ledger interface{}) (*LedgerHeaderResult, error) {
+	cmd := &LedgerHeaderCommand{
+		Command: newCommand("ledger_closed"),
+	}
+	r.outgoing <- cmd
+	<-cmd.Ready
+	if cmd.CommandError != nil {
+		return nil, cmd.CommandError
+	}
+	return cmd.Result, nil
+}
+
 // Synchronously requests paths
 func (r *Remote) RipplePathFind(src, dest data.Account, amount data.Amount, srcCurr *[]data.Currency) (*RipplePathFindResult, error) {
 	cmd := &RipplePathFindCommand{
